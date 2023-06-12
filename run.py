@@ -1,5 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -36,7 +37,7 @@ def get_sales_data():
 def validate_data(values):
     """
     Inside the try, convert all strings into intergers. 
-    If the string can't be converted to in raise an exception
+    If the string can't be converted to int raise an exception
     or if they aren't exactly 6 values
     """
     try:
@@ -60,6 +61,26 @@ def update_sales_worksheet(data):
     sales_worksheet.append_row(data)
     print("Sales worksheet updated successfully.\n")
 
-data = get_sales_data() 
-sales_data = [int(num) for num in data]
-update_sales_worksheet(sales_data)
+def calculate_surplus_data(sales_row):
+    """
+    Compare sales and stoc and calculate the surplus for each type.
+    The surplus is defined as the sales figure subtracted from the stock:
+    -postive surplus indicates waste
+    -Negative surplus indicates extra made when stock was sold out
+    """
+    print("Calculating surplus data...") 
+    stock = SHEET.worksheet("stock").get_all_values()
+    stock_row = stock[-1]
+    pprint(stock_row)
+
+def main():
+    """
+    Run all program functions
+    """
+    data = get_sales_data() 
+    sales_data = [int(num) for num in data]
+    update_sales_worksheet(sales_data)
+    calculate_surplus_data(sales_data)
+
+print("Welcome to Sand Wiches Data Automation\n")
+main()
